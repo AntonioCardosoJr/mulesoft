@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="f2278fd1-5b77-4610-b599-2cc1debd5b0c" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="teste-ci-cd-apiFlow" doc:id="a93dda02-5126-4e93-87cf-4d0050c957be" >
+		<http:listener doc:name="Listener" doc:id="f596122b-ecc7-4403-a8ae-91bcdbe86233" config-ref="HTTP_Listener_config" path="/*"/>
+		<set-payload value="Teste criação ci/cd github" doc:name="Set Payload" doc:id="4aeb9d21-c057-4137-bb0a-56e2f282d789" />
+		<logger level="INFO" doc:name="Logger" doc:id="e63457e7-dbd0-422c-9b2f-f0bfe251f529" message="#[payload]"/>
+	</flow>
+</mule>
