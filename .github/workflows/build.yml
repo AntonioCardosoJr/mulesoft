@@ -79,10 +79,10 @@ jobs:
       with:
           name: artifacts
           path: target/*.jar    
-  deploy:
-    needs: build
-    runs-on: windows-latest
-    steps:    
+deploy:
+  needs: build
+  runs-on: windows-latest
+  steps:    
     - name: Checkout this repo
       uses: actions/checkout@v3
 
@@ -106,19 +106,17 @@ jobs:
         PASSWORD: ${{ secrets.anypoint_platform_password }}
       run: |
         # Encontrar o nome do artefato
-        $artifactName = Get-ChildItem -Path . -Filter *.jar | Select-Object -First 1
+        $artifact = Get-ChildItem -Path . -Filter *.jar | Select-Object -First 1
         
         # Verificar se o artefato foi encontrado
-        if ($null -eq $artifactName) {
+        if ($null -eq $artifact) {
           Write-Error "Erro: Nenhum arquivo JAR encontrado."
           exit 1
         }
 
         # Executar o comando de deploy
-        mvn deploy -DmuleDeploy `
-          -Dmule.artifact=$artifactName.FullName `
-          -Danypoint.username="$env:USERNAME" `
-          -Danypoint.password="$env:PASSWORD"
+        mvn deploy -DmuleDeploy -Dmule.artifact=$artifact.FullName -Danypoint.username="$env:USERNAME" -Danypoint.password="$env:PASSWORD"
+
 
 #  deploy:
 #    needs: build
