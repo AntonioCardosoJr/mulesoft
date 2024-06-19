@@ -118,6 +118,7 @@ jobs:
           mvn deploy -DmuleDeploy -Dmule.artifact=$artifact.FullName -Danypoint.username="$env:USERNAME" -Danypoint.password="$env:PASSWORD"
 
 
+
 #  deploy:
 #    needs: build
 #    runs-on: windows-latest
