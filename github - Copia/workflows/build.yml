@@ -102,8 +102,8 @@ jobs:
       - name: Deploy to Sandbox
         shell: pwsh
         env:
-          ID: ${{ secrets.CONNECTED_APP_CLIENT_ID }}
-          SECRET: ${{ secrets.CONNECTED_APP_CLIENT_SECRET }}
+          ANYPOINT_USERNAME: ${{ secrets.anypoint_platform_username }}
+          ANYPOINT_PASSWORD: ${{ secrets.anypoint_platform_password }}
         run: |
           # Encontrar o nome do artefato
           $artifact = Get-ChildItem -Path . -Filter *.jar | Select-Object -First 1
@@ -115,7 +115,7 @@ jobs:
           }
 
           # Executar o comando de deploy
-          & mvn deploy -DmuleDeploy -Dmule.artifact="$($artifact.FullName)" -Dclient.id="$ID" -Dclient.secret="$SECRET"
+          & mvn deploy -DmuleDeploy -Dmule.artifact="$($artifact.FullName)" -Danypoint.username="$env:ANYPOINT_USERNAME" -Danypoint.password="$env:ANYPOINT_PASSWORD"
 
 
 #  deploy:
