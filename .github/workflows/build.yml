@@ -79,43 +79,43 @@ jobs:
       with:
           name: artifacts
           path: target/*.jar    
-deploy:
-  needs: build
-  runs-on: windows-latest
-  steps:    
-    - name: Checkout this repo
-      uses: actions/checkout@v3
+  deploy:
+    needs: build
+    runs-on: windows-latest
+    steps:    
+      - name: Checkout this repo
+        uses: actions/checkout@v3
 
-    - name: Cache dependencies
-      uses: actions/cache@v3
-      with:
-        path: ~/.m2/repository
-        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-        restore-keys: |
-          ${{ runner.os }}-maven-
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
 
-    - name: Download build artifacts
-      uses: actions/download-artifact@v3
-      with:
-        name: artifacts
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: artifacts
 
-    - name: Deploy to Sandbox
-      shell: pwsh
-      env:
-        USERNAME: ${{ secrets.anypoint_platform_username }}
-        PASSWORD: ${{ secrets.anypoint_platform_password }}
-      run: |
-        # Encontrar o nome do artefato
-        $artifact = Get-ChildItem -Path . -Filter *.jar | Select-Object -First 1
-        
-        # Verificar se o artefato foi encontrado
-        if ($null -eq $artifact) {
-          Write-Error "Erro: Nenhum arquivo JAR encontrado."
-          exit 1
-        }
+      - name: Deploy to Sandbox
+        shell: pwsh
+        env:
+          USERNAME: ${{ secrets.anypoint_platform_username }}
+          PASSWORD: ${{ secrets.anypoint_platform_password }}
+        run: |
+          # Encontrar o nome do artefato
+          $artifact = Get-ChildItem -Path . -Filter *.jar | Select-Object -First 1
+          
+          # Verificar se o artefato foi encontrado
+          if ($null -eq $artifact) {
+            Write-Error "Erro: Nenhum arquivo JAR encontrado."
+            exit 1
+          }
 
-        # Executar o comando de deploy
-        mvn deploy -DmuleDeploy -Dmule.artifact=$artifact.FullName -Danypoint.username="$env:USERNAME" -Danypoint.password="$env:PASSWORD"
+          # Executar o comando de deploy
+          mvn deploy -DmuleDeploy -Dmule.artifact=$artifact.FullName -Danypoint.username="$env:USERNAME" -Danypoint.password="$env:PASSWORD"
 
 
 #  deploy:
