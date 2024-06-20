@@ -116,7 +116,7 @@ jobs:
 
           # Executar o comando de deploy
           mvn deploy -DmuleDeploy 
-          -Dmule.artifact="$($artifactName)" 
+          -Dmule.artifact=$artifactstatuName
           -Dclient.id="$ID" 
           -Dclient.secret="$SECRET"
 
