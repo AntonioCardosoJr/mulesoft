@@ -27,6 +27,21 @@ jobs:
         distribution: 'adopt'
         java-version: 11
 
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
+    
+    - name: Stamp artifact file name with commit hash
+      shell: pwsh
+      run: |
+        $artifactName1 = Get-ChildItem -Path target -Filter *.jar | Select-Object -First 1
+        if ($null -eq $artifactName1) {
+          Write-Error "Nenhum arquivo JAR encontrado no diretório target"
+          exit 1
+        }
+        $commitHash = (git rev-parse --short "$env:GITHUB_SHA")
+        $artifactName2 = $artifactName1.Name -replace '.jar$', "-$commitHash.jar"
+        Rename-Item -Path $artifactName1.FullName -NewName $artifactName2
+        $artifactPath = Join-Path $artifactName1.DirectoryName $artifactName2
 #    - name: Build with Maven
 #      run: mvn clean package --file pom.xml
 
@@ -36,22 +51,8 @@ jobs:
 #        name: artifacts
 #        path: target/*.jar    
 
-    - name: Build with Maven
-    run: mvn -B package --file pom.xml
 
-    - name: Stamp artifact file name with commit hash
-    shell: pwsh
-    run: |
-      $artifactName1 = Get-ChildItem -Path target -Filter *.jar | Select-Object -First 1
-      if ($null -eq $artifactName1) {
-          Write-Error "Nenhum arquivo JAR encontrado no diretório target"
-          exit 1
-      }
-      $commitHash = (git rev-parse --short "$env:GITHUB_SHA")
-      $artifactName2 = $artifactName1.Name -replace '.jar$', "-$commitHash.jar"
-      Rename-Item -Path $artifactName1.FullName -NewName $artifactName2
-      $artifactPath = Join-Path $artifactName1.DirectoryName $artifactName2
-      
+
   deploy:
     needs: build
     runs-on: windows-latest
