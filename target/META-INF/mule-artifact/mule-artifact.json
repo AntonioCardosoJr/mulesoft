@@ -1,0 +1,27 @@
+{
+  "configs": [
+    "global.xml",
+    "teste-ci-cd-api.xml"
+  ],
+  "secureProperties": [],
+  "redeploymentEnabled": true,
+  "name": "com.mycompany:teste-ci-cd-api:1.0.0-SNAPSHOT",
+  "minMuleVersion": "4.4.0",
+  "requiredProduct": "MULE",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedPackages": [],
+      "exportedResources": [
+        "global.xml",
+        "log4j2.xml",
+        "properties/dev-properties.yaml",
+        "teste-ci-cd-api.xml"
+      ]
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  }
+}
