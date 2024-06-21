@@ -57,21 +57,24 @@ jobs:
           name: artifacts
 
       - name: Deploy to CloudHub
-        shell: cmd
+        shell: pwsh
         env:
           ANYPOINT_CLIENT_ID: ${{ secrets.ANYPOINT_CLIENT_ID }}
           ANYPOINT_CLIENT_SECRET: ${{ secrets.ANYPOINT_CLIENT_SECRET }}
           ANYPOINT_ENV: "sandbox" # ou o ambiente que você deseja usar
           DECRYPTION_KEY: ${{ secrets.DECRYPTION_KEY }}
         run: |
-          REM Encontrar o nome do artefato
-          FOR /F "tokens=*" %%i IN ('DIR /B target\*.jar') DO SET artifact=%%i
+          # Encontrar o nome do artefato
+          $artifact = Get-ChildItem -Path . -Filter *.jar | Select-Object -First 1
+          
+          # Verificar se o artefato foi encontrado
+          if ($null -eq $artifact) {
+            Write-Error "Erro: Nenhum arquivo JAR encontrado."
+            exit 1
+          }
 
-          REM Verificar se o artefato foi encontrado
-          IF "%artifact%"=="" (
-            ECHO Erro: Nenhum arquivo JAR encontrado.
-            EXIT /B 1
-          )
-
-          REM Executar o comando de deploy
-          mvn mule:deploy -Danypoint.clientId=%ANYPOINT_CLIENT_ID% -Danypoint.clientSecret=%ANYPOINT_CLIENT_SECRET% -Danypoint.env=%ANYPOINT_ENV% -Ddecryption.key=%DECRYPTION_KEY% -DmuleDeploy
+          # Executar o comando de deploy
+          # mvn deploy -e -X -DmuleDeploy -Dmule.artifact=$artifact.Name -Dclient.id="$env:ID" -Dclient.secret="$env:SECRET"
+          $mvnCmd = "mvn deploy -e -X -DmuleDeploy -Dmule.artifact=$($artifact.Name) -Dclient.id=`"$env:ID`" -Dclient.secret=`"$env:SECRET`""
+          Write-Host "Executando: $mvnCmd"
+          Invoke-Expression $mvnCmd
