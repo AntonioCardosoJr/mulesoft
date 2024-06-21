@@ -27,15 +27,31 @@ jobs:
         distribution: 'adopt'
         java-version: 11
 
+#    - name: Build with Maven
+#      run: mvn clean package --file pom.xml
+
+#    - name: Upload artifact 
+#      uses: actions/upload-artifact@v3
+#      with:
+#        name: artifacts
+#        path: target/*.jar    
+
     - name: Build with Maven
-      run: mvn clean package --file pom.xml
+    run: mvn -B package --file pom.xml
 
-    - name: Upload artifact 
-      uses: actions/upload-artifact@v3
-      with:
-        name: artifacts
-        path: target/*.jar    
-
+    - name: Stamp artifact file name with commit hash
+    shell: pwsh
+    run: |
+      $artifactName1 = Get-ChildItem -Path target -Filter *.jar | Select-Object -First 1
+      if ($null -eq $artifactName1) {
+          Write-Error "Nenhum arquivo JAR encontrado no diretório target"
+          exit 1
+      }
+      $commitHash = (git rev-parse --short "$env:GITHUB_SHA")
+      $artifactName2 = $artifactName1.Name -replace '.jar$', "-$commitHash.jar"
+      Rename-Item -Path $artifactName1.FullName -NewName $artifactName2
+      $artifactPath = Join-Path $artifactName1.DirectoryName $artifactName2
+      
   deploy:
     needs: build
     runs-on: windows-latest
@@ -57,24 +73,21 @@ jobs:
           name: artifacts
 
       - name: Deploy to CloudHub
-        shell: pwsh
+        shell: cmd
         env:
           ANYPOINT_CLIENT_ID: ${{ secrets.ANYPOINT_CLIENT_ID }}
           ANYPOINT_CLIENT_SECRET: ${{ secrets.ANYPOINT_CLIENT_SECRET }}
           ANYPOINT_ENV: "sandbox" # ou o ambiente que você deseja usar
           DECRYPTION_KEY: ${{ secrets.DECRYPTION_KEY }}
         run: |
-          # Encontrar o nome do artefato
-          $artifact = Get-ChildItem -Path . -Filter *.jar | Select-Object -First 1
-          
-          # Verificar se o artefato foi encontrado
-          if ($null -eq $artifact) {
-            Write-Error "Erro: Nenhum arquivo JAR encontrado."
-            exit 1
-          }
+          REM Encontrar o nome do artefato
+          FOR /F "tokens=*" %%i IN ('DIR /B target\*.jar') DO SET artifact=%%i
 
-          # Executar o comando de deploy
-          # mvn deploy -e -X -DmuleDeploy -Dmule.artifact=$artifact.Name -Dclient.id="$env:ID" -Dclient.secret="$env:SECRET"
-          $mvnCmd = "mvn deploy -e -X -DmuleDeploy -Dmule.artifact=$($artifact.Name) -Dclient.id=`"$env:ID`" -Dclient.secret=`"$env:SECRET`""
-          Write-Host "Executando: $mvnCmd"
-          Invoke-Expression $mvnCmd
+          REM Verificar se o artefato foi encontrado
+          IF "%artifact%"=="" (
+            ECHO Erro: Nenhum arquivo JAR encontrado.
+            EXIT /B 1
+          )
+
+          REM Executar o comando de deploy
+          mvn mule:deploy -Danypoint.clientId=%ANYPOINT_CLIENT_ID% -Danypoint.clientSecret=%ANYPOINT_CLIENT_SECRET% -Danypoint.env=%ANYPOINT_ENV% -Ddecryption.key=%DECRYPTION_KEY% -DmuleDeploy
