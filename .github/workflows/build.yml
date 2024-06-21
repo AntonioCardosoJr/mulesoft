@@ -28,30 +28,13 @@ jobs:
         java-version: 11
 
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
-    
-    - name: Stamp artifact file name with commit hash
-      shell: pwsh
-      run: |
-        $artifactName1 = Get-ChildItem -Path target -Filter *.jar | Select-Object -First 1
-        if ($null -eq $artifactName1) {
-          Write-Error "Nenhum arquivo JAR encontrado no diretório target"
-          exit 1
-        }
-        $commitHash = (git rev-parse --short "$env:GITHUB_SHA")
-        $artifactName2 = $artifactName1.Name -replace '.jar$', "-$commitHash.jar"
-        Rename-Item -Path $artifactName1.FullName -NewName $artifactName2
-        $artifactPath = Join-Path $artifactName1.DirectoryName $artifactName2
-#    - name: Build with Maven
-#      run: mvn clean package --file pom.xml
+      run: mvn clean package --file pom.xml
 
-#    - name: Upload artifact 
-#      uses: actions/upload-artifact@v3
-#      with:
-#        name: artifacts
-#        path: target/*.jar    
-
-
+    - name: Upload artifact 
+      uses: actions/upload-artifact@v3
+      with:
+        name: artifacts
+        path: target/*.jar    
 
   deploy:
     needs: build
@@ -82,13 +65,25 @@ jobs:
           DECRYPTION_KEY: ${{ secrets.DECRYPTION_KEY }}
         run: |
           REM Encontrar o nome do artefato
-          FOR /F "tokens=*" %%i IN ('DIR /B target\*.jar') DO SET artifact=%%i
-
+          FOR /F "tokens=*" %%i IN ('DIR /B artifacts\*.jar') DO SET artifact=%%i
+ 
           REM Verificar se o artefato foi encontrado
           IF "%artifact%"=="" (
             ECHO Erro: Nenhum arquivo JAR encontrado.
             EXIT /B 1
           )
-
+ 
           REM Executar o comando de deploy
-          mvn mule:deploy -Danypoint.clientId=%ANYPOINT_CLIENT_ID% -Danypoint.clientSecret=%ANYPOINT_CLIENT_SECRET% -Danypoint.env=%ANYPOINT_ENV% -Ddecryption.key=%DECRYPTION_KEY% -DmuleDeploy
+          mvn mule:deploy -Danypoint.clientId=%ANYPOINT_CLIENT_ID% -Danypoint.clientSecret=%ANYPOINT_CLIENT_SECRET% -Danypoint.env=%ANYPOINT_ENV% -Ddecryption.key=%DECRYPTION_KEY% -DmuleDeploy          
+#        run: |
+#          REM Encontrar o nome do artefato
+#          FOR /F "tokens=*" %%i IN ('DIR /B target\*.jar') DO SET artifact=%%i#
+
+#          REM Verificar se o artefato foi encontrado
+#          IF "%artifact%"=="" (
+#            ECHO Erro: Nenhum arquivo JAR encontrado.
+#            EXIT /B 1
+#          )
+
+#          REM Executar o comando de deploy
+#          mvn mule:deploy -Danypoint.clientId=%ANYPOINT_CLIENT_ID% -Danypoint.clientSecret=%ANYPOINT_CLIENT_SECRET% -Danypoint.env=%ANYPOINT_ENV% -Ddecryption.key=%DECRYPTION_KEY% -DmuleDeploy
