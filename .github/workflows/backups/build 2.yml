@@ -30,7 +30,7 @@ jobs:
       - name: Build with Maven
         run: mvn clean package --file pom.xml
 
-      - name: List files in target directory with permissions
+      - name: List files in target directory
         run: ls -la target
 
       - name: Upload artifact
@@ -58,16 +58,9 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: build-artifact
-          path: ./build-artifact/
 
-      - name: List downloaded artifacts with permissions
-        run: ls -la ./build-artifact/
-
-      - name: Verify current directory
-        run: pwd
-
-      - name: Verify permissions of current directory
-        run: ls -la
+      - name: List downloaded artifacts
+        run: ls -la build-artifact
 
       - name: Deploy to CloudHub
         env:
@@ -77,7 +70,7 @@ jobs:
           DECRYPTION_KEY: ${{ secrets.DECRYPTION_KEY }}
         run: |
           # Encontrar o nome do artefato
-          artifact=$(ls ./build-artifact/*.jar | head -n 1)
+          artifact=$(ls build-artifact/*.jar | head -n 1)
           
           # Verificar se o artefato foi encontrado
           if [ -z "$artifact" ]; then
