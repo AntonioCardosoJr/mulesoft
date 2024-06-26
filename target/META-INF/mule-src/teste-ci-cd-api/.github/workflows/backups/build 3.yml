@@ -33,9 +33,6 @@ jobs:
       - name: List files in target directory with permissions
         run: ls -la target
 
-      - name: Set permissions on target directory
-        run: chmod -R 755 target
-
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
@@ -66,9 +63,6 @@ jobs:
       - name: List downloaded artifacts with permissions
         run: ls -la ./build-artifact/
 
-      - name: Set permissions on downloaded artifacts
-        run: chmod -R 755 ./build-artifact/
-
       - name: Verify current directory
         run: pwd
 
@@ -95,5 +89,4 @@ jobs:
           echo "Artefato encontrado: $artifact"
 
           # Executar o comando de deploy
-          mvn mule:deploy -Danypoint.clientId=$ANYPOINT_CLIENT_ID -Danypoint.clientSecret=$ANYPOINT_CLIENT_SECRET -Danypoint.env=$ANYPOINT_ENV -Ddecryption.key=$DECRYPTION_KEY -Dartifact=$artifact
-          # -DmuleDeploy 
+          mvn mule:deploy -Danypoint.clientId=$ANYPOINT_CLIENT_ID -Danypoint.clientSecret=$ANYPOINT_CLIENT_SECRET -Danypoint.env=$ANYPOINT_ENV -Ddecryption.key=$DECRYPTION_KEY -DmuleDeploy -Dartifact=$artifact

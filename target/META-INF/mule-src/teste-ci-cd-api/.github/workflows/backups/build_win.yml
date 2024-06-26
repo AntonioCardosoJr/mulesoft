@@ -1,0 +1,89 @@
+name: Build and Deploy to Production
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout this repo
+      uses: actions/checkout@v3
+
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'adopt'
+        java-version: 11
+
+    - name: Build with Maven
+      run: mvn clean package --file pom.xml
+
+    - name: Upload artifact 
+      uses: actions/upload-artifact@v3
+      with:
+        name: artifacts
+        path: target/*.jar    
+
+  deploy:
+    needs: build
+    runs-on: windows-latest
+    steps:    
+      - name: Checkout this repo
+        uses: actions/checkout@v3
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: artifacts
+
+      - name: Deploy to CloudHub
+        shell: cmd
+        env:
+          ANYPOINT_CLIENT_ID: ${{ secrets.ANYPOINT_CLIENT_ID }}
+          ANYPOINT_CLIENT_SECRET: ${{ secrets.ANYPOINT_CLIENT_SECRET }}
+          ANYPOINT_ENV: "sandbox" # ou o ambiente que você deseja usar
+          DECRYPTION_KEY: ${{ secrets.DECRYPTION_KEY }}
+        run: |
+          REM Encontrar o nome do artefato
+          FOR /F "tokens=*" %%i IN ('DIR /B artifacts\*.jar') DO SET artifact=%%i
+ 
+          REM Verificar se o artefato foi encontrado
+          IF "%artifact%"=="" (
+            ECHO Erro: Nenhum arquivo JAR encontrado.
+            EXIT /B 1
+          )
+ 
+          REM Executar o comando de deploy
+          mvn mule:deploy -Danypoint.clientId=%ANYPOINT_CLIENT_ID% -Danypoint.clientSecret=%ANYPOINT_CLIENT_SECRET% -Danypoint.env=%ANYPOINT_ENV% -Ddecryption.key=%DECRYPTION_KEY% -DmuleDeploy          
+#        run: |
+#          REM Encontrar o nome do artefato
+#          FOR /F "tokens=*" %%i IN ('DIR /B target\*.jar') DO SET artifact=%%i#
+
+#          REM Verificar se o artefato foi encontrado
+#          IF "%artifact%"=="" (
+#            ECHO Erro: Nenhum arquivo JAR encontrado.
+#            EXIT /B 1
+#          )
+
+#          REM Executar o comando de deploy
+#          mvn mule:deploy -Danypoint.clientId=%ANYPOINT_CLIENT_ID% -Danypoint.clientSecret=%ANYPOINT_CLIENT_SECRET% -Danypoint.env=%ANYPOINT_ENV% -Ddecryption.key=%DECRYPTION_KEY% -DmuleDeploy
