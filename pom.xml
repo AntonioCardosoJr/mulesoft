@@ -42,16 +42,18 @@
 						<connectedAppClientSecret>2434396F54be4f02A456510ea9641338</connectedAppClientSecret>
 						<connectedAppGrantType>client_credentials</connectedAppGrantType>
 						<applicationName>${app.name}</applicationName>
-						<environment>${env}</environment>
+						<environment>${mule-env}</environment>
 						<workerType>MICRO</workerType>
 						<region>us-east-2</region>
 						<workers>1</workers>
 						<objectStoreV2>true</objectStoreV2>
 						<environment>Sandbox</environment>
-						<businessGroup>Tecnocontrol</businessGroup>						
+						<businessGroup>Tecnocontrol</businessGroup>	
+						<!-- 					
 						<properties>
 							<secure.key>${decryption.key}</secure.key>
 						</properties>
+						 -->
 					</cloudHubDeployment>
 					<classifier>mule-application</classifier>
 				</configuration>  

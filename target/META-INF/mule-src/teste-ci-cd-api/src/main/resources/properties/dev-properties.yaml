@@ -1,5 +1,8 @@
 http:
-  port: 8081
+  port: "8081"
+  
+app:
+  name: "teste-ci-cd-api"
   
 secrets:
   anypoint_platform_username: "myusername"
