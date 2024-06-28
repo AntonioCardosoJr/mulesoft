@@ -33,17 +33,11 @@ jobs:
       - name: List files in target directory
         run: ls -la target
 
-      - name: Create build-artifact directory and move JAR
-        run: |
-          mkdir -p build-artifact
-          mv target/*.jar build-artifact/
-          ls -la build-artifact
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: build-artifact
-          path: build-artifact/*.jar
+          path: target/*.jar
 
   deploy:
     needs: build
@@ -66,9 +60,7 @@ jobs:
           name: build-artifact
 
       - name: List downloaded artifacts
-        run: |
-          ls -la
-          ls -la build-artifact/
+        run: ls -la
 
       - name: Verify current directory
         run: pwd
@@ -82,14 +74,8 @@ jobs:
           ANYPOINT_CLIENT_SECRET: ${{ secrets.ANYPOINT_CLIENT_SECRET }}
           ANYPOINT_ENV: ${{ secrets.ANYPOINT_ENV }} # Verifique o valor no GitHub Secrets
         run: |
-          # Verificar se o diretório build-artifact existe
-          if [ ! -d "build-artifact" ]; then
-            echo "Erro: Diretório build-artifact não encontrado."
-            exit 1
-          fi
-
           # Encontrar o nome do artefato
-          artifact=$(ls build-artifact/*.jar | head -n 1)
+          artifact=$(ls *.jar | head -n 1)
           
           # Verificar se o artefato foi encontrado
           if [ -z "$artifact" ]; then
