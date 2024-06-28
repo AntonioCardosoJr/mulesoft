@@ -37,7 +37,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-artifact
-          path: target/*.jar    
+          path: target/*.jar
 
   deploy:
     needs: build
@@ -75,6 +75,8 @@ jobs:
           ANYPOINT_ENV: ${{ secrets.ANYPOINT_ENV }} # Verifique o valor no GitHub Secrets
         run: |
           # Encontrar o nome do artefato
+          mkdir -p build-artifact
+          mv $(find . -name "*.jar") build-artifact/
           artifact=$(ls build-artifact/*.jar | head -n 1)
           
           # Verificar se o artefato foi encontrado
@@ -87,4 +89,4 @@ jobs:
           echo "Artefato encontrado: $artifact"
 
           # Executar o comando de deploy com logging detalhado
-          mvn mule:deploy -X -Danypoint.clientId=$ANYPOINT_CLIENT_ID -Danypoint.clientSecret=$ANYPOINT_CLIENT_SECRET -Danypoint.env=$ANYPOINT_ENV -Dartifact=$artifact
+          mvn mule:deploy -X -Danypoint.clientId=$ANYPOINT_CLIENT_ID -Danypoint.clientSecret=$ANYPOINT_CLIENT_SECRET -Danypoint.env=$ANYPOINT_ENV -Dartifact=$(pwd)/$artifact
