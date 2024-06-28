@@ -88,4 +88,4 @@ jobs:
           echo "Artefato encontrado: $artifact"
 
           # Executar o comando de deploy com logging detalhado
-          mvn mule:deploy -X -Danypoint.clientId=$ANYPOINT_CLIENT_ID -Danypoint.clientSecret=$ANYPOINT_CLIENT_SECRET -Danypoint.env=$ANYPOINT_ENV -Dartifact=$(pwd)/$artifact
+          mvn mule:deploy -X -Danypoint.clientId=$ANYPOINT_CLIENT_ID -Danypoint.clientSecret=$ANYPOINT_CLIENT_SECRET -Danypoint.env=$ANYPOINT_ENV -Dartifact=$artifact
