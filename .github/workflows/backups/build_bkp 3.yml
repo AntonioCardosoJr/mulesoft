@@ -33,6 +33,9 @@ jobs:
       - name: List files in target directory with permissions
         run: ls -la target
 
+      - name: Set permissions on target directory
+        run: chmod -R 755 target
+
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
@@ -63,6 +66,9 @@ jobs:
       - name: List downloaded artifacts with permissions
         run: ls -la ./build-artifact/
 
+      - name: Set permissions on downloaded artifacts
+        run: chmod -R 755 ./build-artifact/
+
       - name: Verify current directory
         run: pwd
 
@@ -73,7 +79,9 @@ jobs:
         env:
           ANYPOINT_CLIENT_ID: ${{ secrets.ANYPOINT_CLIENT_ID }}
           ANYPOINT_CLIENT_SECRET: ${{ secrets.ANYPOINT_CLIENT_SECRET }}
-          ANYPOINT_ENV: ${{ secrets.ANYPOINT_ENV }} # Verifique o valor no GitHub Secrets
+          ANYPOINT_ENV: ${{ secrets.ANYPOINT_ENV }}
+#          ANYPOINT_ENV: "sandbox" # ou o ambiente que você deseja usar
+          DECRYPTION_KEY: ${{ secrets.DECRYPTION_KEY }}
         run: |
           # Encontrar o nome do artefato
           artifact=$(ls ./build-artifact/*.jar | head -n 1)
@@ -87,5 +95,6 @@ jobs:
           # Exibir o caminho do artefato
           echo "Artefato encontrado: $artifact"
 
-          # Executar o comando de deploy com logging detalhado
-          mvn mule:deploy -X -Danypoint.clientId=$ANYPOINT_CLIENT_ID -Danypoint.clientSecret=$ANYPOINT_CLIENT_SECRET -Danypoint.env=$ANYPOINT_ENV -Dartifact=$(pwd)/$artifact
+          # Executar o comando de deploy
+          mvn mule:deploy -Danypoint.clientId=$ANYPOINT_CLIENT_ID -Danypoint.clientSecret=$ANYPOINT_CLIENT_SECRET -Danypoint.env=$ANYPOINT_ENV -Dartifact=$artifact -X
+          
