@@ -27,11 +27,17 @@ jobs:
           distribution: 'adopt'
           java-version: 11
 
-      - name: Clean and Build with Maven
-        run: mvn clean package --file pom.xml
+      - name: Clean Maven
+        run: mvn clean --file pom.xml
 
-      - name: List files in target directory with permissions
+      - name: Build with Maven
+        run: mvn package --file pom.xml
+
+      - name: List files in target directory
         run: ls -la target
+
+      - name: Show Maven local repository content
+        run: ls -la ~/.m2/repository/com/mycompany/teste-ci-cd-api/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -60,7 +66,7 @@ jobs:
           name: build-artifact
           path: build-artifact/
 
-      - name: List downloaded artifacts with permissions
+      - name: List downloaded artifacts
         run: ls -la build-artifact/
 
       - name: Verify current directory
