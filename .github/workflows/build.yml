@@ -59,6 +59,9 @@ jobs:
         with:
           name: build-artifact
 
+      - name: List downloaded artifacts
+        run: ls -la build-artifact/
+
       - name: Verify current directory
         run: pwd
 
@@ -71,9 +74,13 @@ jobs:
           ANYPOINT_CLIENT_SECRET: ${{ secrets.ANYPOINT_CLIENT_SECRET }}
           ANYPOINT_ENV: ${{ secrets.ANYPOINT_ENV }} # Verifique o valor no GitHub Secrets
         run: |
+          # Verificar se o diretório build-artifact existe
+          if [ ! -d "build-artifact" ]; then
+            echo "Erro: Diretório build-artifact não encontrado."
+            exit 1
+          fi
+
           # Encontrar o nome do artefato
-          mkdir -p build-artifact
-          mv $(find . -name "*.jar") build-artifact/
           artifact=$(ls build-artifact/*.jar | head -n 1)
           
           # Verificar se o artefato foi encontrado
