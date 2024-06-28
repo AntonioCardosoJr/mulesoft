@@ -55,17 +55,21 @@
 				</configuration>  
 -->
 				<configuration>
-						<skip>false</skip>
+					<cloudHubDeployment>
 						<uri>https://anypoint.mulesoft.com</uri>
 						<muleVersion>${app.runtime}</muleVersion>
 						<connectedAppClientId>58e180a62b0c4d57a59d91f02a2996a2</connectedAppClientId>
 						<connectedAppClientSecret>2434396F54be4f02A456510ea9641338</connectedAppClientSecret>
+						<connectedAppGrantType>client_credentials</connectedAppGrantType>
 						<applicationName>teste-ci-cd-api</applicationName>
+						<workerType>MICRO</workerType>
+						<region>us-east-2</region>
+						<workers>1</workers>
+						<objectStoreV2>true</objectStoreV2>
 						<environment>Sandbox</environment>
 						<businessGroup>Autônomo</businessGroup>
-						<region>us-east-2</region>
-						<workerType>MICRO</workerType>
-						<workers>1</workers>
+					</cloudHubDeployment>
+					<classifier>mule-application</classifier>					
 				</configuration>
 			</plugin>
 		</plugins>
