@@ -27,8 +27,11 @@ jobs:
           distribution: 'adopt'
           java-version: 11
 
+      - name: Clean Maven Repository
+        run: mvn clean
+
       - name: Build with Maven
-        run: mvn clean package --file pom.xml
+        run: mvn package --file pom.xml
 
       - name: List files in target directory with permissions
         run: ls -la target
@@ -88,4 +91,4 @@ jobs:
           echo "Artefato encontrado: $artifact"
 
           # Executar o comando de deploy com logging detalhado
-          mvn mule:deploy -X -Danypoint.clientId=$ANYPOINT_CLIENT_ID -Danypoint.clientSecret=$ANYPOINT_CLIENT_SECRET -Danypoint.env=$ANYPOINT_ENV -Dartifact=$artifact
+          mvn mule:deploy -X -Danypoint.clientId=$ANYPOINT_CLIENT_ID -Danypoint.clientSecret=$ANYPOINT_CLIENT_SECRET -Danypoint.env=$ANYPOINT_ENV -Dartifact=$(pwd)/$artifact
