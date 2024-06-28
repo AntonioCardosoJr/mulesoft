@@ -79,7 +79,8 @@ jobs:
         env:
           ANYPOINT_CLIENT_ID: ${{ secrets.ANYPOINT_CLIENT_ID }}
           ANYPOINT_CLIENT_SECRET: ${{ secrets.ANYPOINT_CLIENT_SECRET }}
-          ANYPOINT_ENV: "sandbox" # ou o ambiente que você deseja usar
+          ANYPOINT_ENV: ${{ secrets.ANYPOINT_ENV }}
+#          ANYPOINT_ENV: "sandbox" # ou o ambiente que você deseja usar
           DECRYPTION_KEY: ${{ secrets.DECRYPTION_KEY }}
         run: |
           # Encontrar o nome do artefato
