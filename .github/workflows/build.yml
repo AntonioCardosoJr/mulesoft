@@ -30,10 +30,7 @@ jobs:
       - name: Clean and Build with Maven
         run: mvn clean package --file pom.xml
 
-      - name: Install artifact to local repository
-        run: mvn install --file pom.xml
-
-      - name: List files in target directory
+      - name: List files in target directory after build
         run: ls -la target
 
       - name: Upload artifact
@@ -63,12 +60,12 @@ jobs:
           name: build-artifact
 
       - name: List downloaded artifacts
-        run: ls -la
+        run: ls -la build-artifact/
 
-      - name: Verify current directory
-        run: pwd
+      - name: Move JAR to current directory
+        run: mv build-artifact/*.jar .
 
-      - name: Verify permissions of current directory
+      - name: List files in current directory
         run: ls -la
 
       - name: Deploy to CloudHub
@@ -78,13 +75,13 @@ jobs:
           ANYPOINT_ENV: ${{ secrets.ANYPOINT_ENV }} # Verifique o valor no GitHub Secrets
         run: |
           # Verificar se o artefato foi baixado
-          if [ ! -f target/*.jar ]; then
-            echo "Erro: Nenhum arquivo JAR encontrado no diretório target."
+          if [ ! -f *.jar ]; then
+            echo "Erro: Nenhum arquivo JAR encontrado no diretório atual."
             exit 1
           fi
 
           # Encontrar o nome do artefato
-          artifact=$(ls target/*.jar | head -n 1)
+          artifact=$(ls *.jar | head -n 1)
           
           # Verificar se o artefato foi encontrado
           if [ -z "$artifact" ]; then
@@ -96,4 +93,4 @@ jobs:
           echo "Artefato encontrado: $artifact"
 
           # Executar o comando de deploy com logging detalhado
-          mvn mule:deploy -X -Danypoint.clientId=$ANYPOINT_CLIENT_ID -Danypoint.clientSecret=$ANYPOINT_CLIENT_SECRET -Danypoint.env=$ANYPOINT_ENV -Dartifact=$artifact
+          mvn mule:deploy -X -Danypoint.clientId=$ANYPOINT_CLIENT_ID -Danypoint.clientSecret=$ANYPOINT_CLIENT_SECRET -Danypoint.env=$ANYPOINT_ENV -Dartifact=$(pwd)/$artifact
