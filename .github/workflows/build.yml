@@ -60,10 +60,10 @@ jobs:
           name: build-artifact
 
       - name: List downloaded artifacts
-        run: ls -la build-artifact/
+        run: ls -la target
 
       - name: Move JAR to current directory
-        run: mv build-artifact/*.jar .
+        run: mv target/*.jar .
 
       - name: List files in current directory
         run: ls -la
