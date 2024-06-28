@@ -33,11 +33,16 @@ jobs:
       - name: List files in target directory
         run: ls -la target
 
+      - name: Create build-artifact directory and move JAR
+        run: |
+          mkdir -p build-artifact
+          mv target/*.jar build-artifact/
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: build-artifact
-          path: target/*.jar
+          path: build-artifact/*.jar
 
   deploy:
     needs: build
@@ -58,6 +63,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-artifact
+
+      - name: List downloaded artifacts
+        run: ls -la build-artifact/
 
       - name: Verify current directory
         run: pwd
